@@ -1,0 +1,2 @@
+py AbityIrnituBot.py 
+pause

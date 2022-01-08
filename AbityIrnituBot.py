@@ -4,13 +4,14 @@ import telebot #Библиотека telebot (Основная библиоте�
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters#Импортируем модули из telegramapi (Обработка команд, сообщений,а также фильтры)
 from telebot import types#Импортируем types из telebot
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton#Библиотека отвечающая за клавиатуру
-bot = telebot.TeleBot('981156430:AAFLH8w6tIWGkaXC5iPkU7CMXvYI2R4uS8M')#API бота
-updater = Updater(token='981156430:AAFLH8w6tIWGkaXC5iPkU7CMXvYI2R4uS8M')#API бота
+TOKEN = ''
+bot = telebot.TeleBot(TOKEN)#API бота
+updater = Updater(token=TOKEN)#API бота
 dispatcher = updater.dispatcher
 
 
-@bot.message_handler(content_types = 'Да')#Команда назад
-@bot.message_handler(commands=["start","back"])#Главное меню
+
+@bot.message_handler(commands=["start"])#Главное меню
 def start(m):
 	msg = bot.send_message(m.chat.id, "Вас приветствует AbityBot. Помощь /help")
 	keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -20,7 +21,6 @@ def start(m):
 	bot.send_message(m.chat.id, 'Выбери что тебе нужно.',
 		reply_markup=keyboard)
 	bot.register_next_step_handler(msg, name)#Назначаем переменную name = ответ пользователя
-
 
 def name(m):								#Обработка переменной name
 	if m.text == 'Информация о направлениях':
@@ -35,12 +35,6 @@ def name(m):								#Обработка переменной name
 		bot.register_next_step_handler(msg, name1)#Назначаем переменную name1 = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
-	elif m.text == 'Часто задаваемые вопросы':
-		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Введите /q + вопрос',
-			reply_markup=keyboard)
-		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Подобрать специальность':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -57,13 +51,61 @@ def name(m):								#Обработка переменной name
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, spec)#Назначаем переменную spec = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
+	elif m.text == 'Часто задаваемые вопросы':
+		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Карта ИРНИТУ']])
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Где находится столовая']])
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Где находится Коворкинг']])
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Где находится Актовый зал']])
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
+		msg = bot.send_message(m.chat.id, 'Выбери один из вопросов',
+			reply_markup=keyboard)
+		bot.register_next_step_handler(msg, vopr)#Назначаем переменную spec = ответ пользователя
+		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
+
+
+def vopr(m):
+	if m.text == 'Карта ИРНИТУ':
+		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+		bot.send_photo(m.chat.id, (open('map.jpg', "rb")))
+		msg = bot.send_message(m.chat.id, 'Держи',
+			reply_markup=keyboard)
+		m.text = 'Часто задаваемые вопросы'
+		reply_markup = name(m)
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
+		bot.register_next_step_handler(msg, start1)
+	elif m.text == 'Где находится столовая':
+		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+		msg = bot.send_message(m.chat.id, 'Столовая находится в корпусе А на цокольном этаже',
+			reply_markup=keyboard)
+		m.text = 'Часто задаваемые вопросы'
+		reply_markup = name(m)
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
+		bot.register_next_step_handler(msg, start1)
+	elif m.text == 'Где находится Коворкинг':
+		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+		msg = bot.send_message(m.chat.id, 'Коворгинг находится в корпусе Г на 2 этаже',
+			reply_markup=keyboard)
+		m.text = 'Часто задаваемые вопросы'
+		reply_markup = name(m)
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
+		bot.register_next_step_handler(msg, start1)
+	elif m.text == 'Где находится Актовый зал':
+		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+		msg = bot.send_message(m.chat.id, 'Актовый зал находится напротив главного входа или в корпусе А',
+			reply_markup=keyboard)
+		m.text = 'Часто задаваемые вопросы'
+		reply_markup = name(m)
+		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
+		bot.register_next_step_handler(msg, start1)
+
 
 
 def spec(m):								#Обработка переменной spec
 	if m.text == 'Математика (профильный уровень)':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '07.03.01 - Архитектура, 07.03.02 - Реконструкция и реставрация архитектурного наследия, 07.03.03 - Дизайн архитектурной среды, 29.03.04 - Технология художественной обработки материалов',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 07.03.01 - Архитектура, 07.03.02 - Реконструкция и реставрация архитектурного наследия, 07.03.03 - Дизайн архитектурной среды, 29.03.04 - Технология художественной обработки материалов',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
@@ -77,7 +119,7 @@ def spec(m):								#Обработка переменной spec
 	elif m.text == 'Математика (профильный уровень), Физика':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '08.03.01 - Строительство, 11.03.01 - Радиотехника,'+
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 08.03.01 - Строительство, 11.03.01 - Радиотехника,'+
 			' 11.03.02 - Инфокоммуникационные технологии и системы связи, 13.03.01 - Теплоэнергетика и теплотехника, 13.03.02 - Электроэнергетика и электротехника,'+
 			' 15.03.01 - Машиностроение, 15.03.04 - Автоматизация технологических процессов и производств, 15.03.05 - Конструкторско-технологическое обеспечение машиностроительных производств,'+
 			' 15.03.06 - Мехатроника и робототехника, 20.03.01 - Техносферная безопасность, 21.03.01 - Нефтегазовое дело, 21.03.02 - Землеустройство и кадастры, 22.03.02 - Металлургия,'+
@@ -91,35 +133,35 @@ def spec(m):								#Обработка переменной spec
 	elif m.text == 'Математика (профильный уровень), Информатика и информационно коммуникационные технологии':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '09.03.01 - Информатика и вычислительная техника, 09.03.02 - Информационные системы и технологии, 10.03.01 - Информационная безопасность',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 09.03.01 - Информатика и вычислительная техника, 09.03.02 - Информационные системы и технологии, 10.03.01 - Информационная безопасность',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Математика (профильный уровень), Английский язык':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '13.03.02 - Электроэнергетика и электротехника (англоязычная программа), 38.03.01 - Экономика (англоязычная программа), 38.03.02 - Менеджмент (англоязычная программа)',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 13.03.02 - Электроэнергетика и электротехника (англоязычная программа), 38.03.01 - Экономика (англоязычная программа), 38.03.02 - Менеджмент (англоязычная программа)',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Математика (профильный уровень), Химия':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '18.03.01 - Химическая технология, 19.03.02 - Продукты питания из растительного сырья',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 18.03.01 - Химическая технология, 19.03.02 - Продукты питания из растительного сырья',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Обществознание, История':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '40.03.01 - Юриспруденция',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 40.03.01 - Юриспруденция',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Обществознание':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + '42.03.02 - Журналистика, 54.03.01 - Дизайн, 54.05.01 - Монументально-декоративное искусство (живопись)',
+		msg = bot.send_message(m.chat.id, 'Тебе подходят:' + ' 42.03.02 - Журналистика, 54.03.01 - Дизайн, 54.05.01 - Монументально-декоративное искусство (живопись)',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
@@ -173,7 +215,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/aspirantura ' ,
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/aspirantura ' ,
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
@@ -185,7 +227,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/aspirantura_zaoch ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/aspirantura_zaoch ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
@@ -197,7 +239,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/bakalavriat ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/bakalavriat ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
@@ -209,7 +251,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/bakalavriat_zaoch ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/bakalavriat_zaoch ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
@@ -221,7 +263,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/spo ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/spo ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
@@ -233,7 +275,7 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/magistratura ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/magistratura ',
 			reply_markup=keyboard)
 		msg = bot.send_message(m.chat.id, 'А также не забудьте посмотреть: ',
 			reply_markup=keyboard)
@@ -247,52 +289,49 @@ def name2(m):								#Обработка переменной name2
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Минимальные баллы']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Контрольные цифры приёма']])
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/napravleniya/magistratura_zaoch ',
+		msg = bot.send_message(m.chat.id, 'Специальности: https://www.istu.edu/abiturientu/urovni/napravleniya/magistratura_zaoch ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, vib)#Назначаем переменную vib = ответ пользователя
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 
-def vib(m):								#Обработка переменной vib
+def vib(m): 							#Обработка переменной vib
 	if m.text == 'Все направления':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Держи все направления: https://www.istu.edu/abiturientu/napravleniya ',
+		msg = bot.send_message(m.chat.id, 'Держи все направления: https://www.istu.edu/abiturientu/urovni/napravleniya ',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Стоимость':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Держи стоимость обучения: https://www.istu.edu/abiturientu/stoimost',
+		msg = bot.send_message(m.chat.id, 'Держи стоимость обучения: https://www.istu.edu/abiturientu/nabor_2021/stoimost',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Минимальные баллы':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Минимальные баллы для поступления: https://www.istu.edu/abiturientu/prokhodnye_bally',
+		msg = bot.send_message(m.chat.id, 'Минимальные баллы для поступления: https://www.istu.edu/abiturientu/exameny/prokhodnye_bally/default',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 	elif m.text == 'Контрольные цифры приёма':
 		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 		keyboard.add(*[types.KeyboardButton(name) for name in ['Вернуться назад в меню']])
-		msg = bot.send_message(m.chat.id, 'Контрольные цифры приёма: https://www.istu.edu/abiturientu/kcp/bakalavriat_ochn',
+		msg = bot.send_message(m.chat.id, 'Контрольные цифры приёма: https://www.istu.edu/abiturientu/nabor_2021/kcp',
 			reply_markup=keyboard)
 		bot.register_next_step_handler(msg, start1)#Переменная start1 - нужна для работы кнопки 'Вернуться назад в меню'
 
 
 ##Все команды
 #Обработчик возвращающий в главное меню
-@bot.message_handler(content_types = 'Вернуться назад в меню')
+@bot.message_handler(commands=["start"])
 def start1(m):	#Обработка переменной start1
 	if m.text == 'Вернуться назад в меню':
-		keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-		keyboard.add(*[types.KeyboardButton(name) for name in ['Да']])
-		msg = bot.send_message(m.chat.id, 'Вы уверены что вы хотите вернуться в меню?',
-			reply_markup=keyboard)
-		bot.register_next_step_handler(msg, start)#Возвращение в главное меню
+		bot.send_message(m.chat.id,"Вовзращаемся в меню")
+		reply_markup=start(m)
 @bot.message_handler(commands = ['url'])#Команда url
 def url(message):
 	markup = types.InlineKeyboardMarkup()
@@ -303,19 +342,6 @@ def url(message):
 def text(message):
 	markup = types.InlineKeyboardMarkup()
 	bot.send_message(message.chat.id, "/start - начать работу , /q + вопрос - общие вопросы , /help - помощь , /url - сайт Ирниту, /back - вернутся в главное меню", reply_markup = markup)
-@bot.message_handler(commands = ['q'])#Команда q
-def text_message(message):#ИИ DialogFlow
-    request = apiai.ApiAI('af519e66270f48249a973bb8ddb5317d').text_request() # Токен API к Dialogflow
-    request.lang = 'ru' # На каком языке будет послан запрос
-    request.session_id = 'AbityTest_bot' # ID Сессии диалога (нужно, чтобы потом учить бота)
-    request.query = message.text # Посылаем запрос к ИИ с сообщением от юзера
-    responseJson = json.loads(request.getresponse().read().decode('utf-8'))
-    response = responseJson['result']['fulfillment']['speech'] # Разбираем JSON и вытаскиваем ответ
-    # Если есть ответ от бота - присылаем юзеру, если нет - бот его не понял
-    if response:
-        bot.send_message(message.chat.id, text=response)
-    else:
-        bot.send_message(message.chat.id, text='Я Вас не совсем понял!')
 
 
 bot.polling()
